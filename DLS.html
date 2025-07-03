@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>2D Football Game</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+
+    h1 { color: white; }
+
+    #gameArea {
+      position: relative;
+      width: 600px;
+      height: 400px;
+      background: green;
+      border: 2px solid white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #player {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: red;
+      border-radius: 50%;
+      bottom: 40px;
+    }
+
+    #ball {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background-color: white;
+      border-radius: 50%;
+      bottom: 70px;
+    }
+
+    .goal {
+      position: absolute;
+      width: 80px;
+      height: 10px;
+      background-color: white;
+      top: 0;
+    }
+
+    .goal.opponent {
+      top: 390px;
+    }
+
+    #scoreBoard {
+      margin-top: 10px;
+      color: white;
+      font-size: 18px;
+    }
+    
+  </style>
+</head>
+<body>
+  <h1>2D Football Game</h1>
+  <div id="gameArea">
+    <div id="player"></div>
+    <div id="ball"></div>
+    <div class="goal" style="left: 260px;"></div> <!-- Player's goal -->
+    <div class="goal opponent" style="left: 260px;"></div> <!-- Opponent's goal -->
+  </div>
+  <div id="scoreBoard">Score: 0</div>
+
+  <script>
+    const player = document.getElementById("player");
+    const ball = document.getElementById("ball");
+    const scoreBoard = document.getElementById("scoreBoard");
+
+    let score = 0;
+    let playerX = 285;
+    let playerY = 330;
+    let ballX = 292;
+    let ballY = 340;
+    let ballSpeedX = 0;
+    let ballSpeedY = 0;
+
+    // Set initial positions
+    player.style.left = playerX + "px";
+    player.style.bottom = playerY + "px";
+    ball.style.left = ballX + "px";
+    ball.style.bottom = ballY + "px";
+
+    // Move player with arrow keys
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" && playerX > 0) {
+        playerX -= 5;
+      } else if (e.key === "ArrowRight" && playerX < 570) {
+        playerX += 5;
+      } else if (e.key === "ArrowUp" && playerY < 340) {
+        playerY += 5;
+      } else if (e.key === "ArrowDown" && playerY > 0) {
+        playerY -= 5;
+      }
+
+      player.style.left = playerX + "px";
+      player.style.bottom = playerY + "px";
+
+      // If the player is near the ball, kick it
+      if (Math.abs(playerX - ballX) < 30 && Math.abs(playerY - ballY) < 30) {
+        ballSpeedX = (playerX - ballX) / 10;
+        ballSpeedY = (playerY - ballY) / 10;
+      }
+    });
+
+    // Move the ball based on its speed
+    function moveBall() {
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+
+      // Ball collision with the ground
+      if (ballY < 0) {
+        ballY = 0;
+        ballSpeedY = 0;
+      }
+
+      // Ball collision with the goals
+      if (ballY > 380 && ballX > 260 && ballX < 340) {
+        if (ballY > 390) {
+          score++;
+          scoreBoard.textContent = "Score: " + score;
+          ballX = 292;
+          ballY = 340;
+          ballSpeedX = 0;
+          ballSpeedY = 0;
+        }
+      }
+
+      // Update ball position
+      ball.style.left = ballX + "px";
+      ball.style.bottom = ballY + "px";
+    }
+
+    // Game loop to move the ball and handle other actions
+    function gameLoop() {
+      moveBall();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Start the game loop
+    gameLoop();
+
+  </script>
+</body>
+</html>
